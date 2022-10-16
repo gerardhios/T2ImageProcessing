@@ -181,6 +181,26 @@ def gaussianFilter(img: np.ndarray, sigma:float):
     plt.title('Zero Padding')
     
     fig.show()
+    
+# Laplacian filter
+def laplaceFilter(img:np.ndarray, kernel:np.ndarray):
+    laplace = cv.filter2D(img, -1, kernel)
+    
+    # Show Images Result
+    fig = plt.figure(figsize=(15, 5))
+    plt.title('Laplace Filter')
+    plt.axis('off')
+    fig.add_subplot(1, 2, 1)
+    plt.imshow(img, cmap='gray')
+    plt.axis('off')
+    plt.title('Original Image')
+    
+    fig.add_subplot(1, 2, 2)
+    plt.imshow(laplace, cmap='gray')
+    plt.axis('off')
+    plt.title('Laplace Filter Aplied')
+    
+    fig.show()
     input("Press Enter to continue...")
     
 if __name__ == "__main__":
@@ -188,3 +208,5 @@ if __name__ == "__main__":
     img = cv.imread(str(image_path), cv.IMREAD_GRAYSCALE)
     averageFilter(img, 3)
     gaussianFilter(img, 0.5)
+    laplaceFilter(img, np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]]))
+    laplaceFilter(img, np.array([[1, 1, 1], [1, -8, 1], [1, 1, 1]]))
