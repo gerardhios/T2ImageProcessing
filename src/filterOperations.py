@@ -1,8 +1,20 @@
 from pathlib import Path
 import numpy as np
 import cv2 as cv
+import matplotlib.pyplot as plt
 
 #Functions
+
+# list of coordinates of the neigborhood
+def neighborhoodCoordinates(x:int, y:int, neigborhood_size:int):
+    neigborhood_coordinates = []
+    N = (neigborhood_size - 1) // 2
+    xp = list(range(-N, N + 1))
+    yp = list(range(-N, N + 1))
+    for i in xp:
+        for j in yp:
+            neigborhood_coordinates.append((x + i, y + j))
+    return neigborhood_coordinates
 
 # Zero padding
 def zeroPadding(img:np.ndarray, neigborhood_coordinates:list):
@@ -90,19 +102,14 @@ def periodicallyExtendedBorders(img:np.ndarray, neigborhood_coordinates:list):
     return sum(neigborhood_values) // len(neigborhood_values)
     
 # average image filter
-def averageFilter(img: np.ndarray):
+def averageFilter(img: np.ndarray, kernel_size:int):
     length, width = img.shape
-    
     zp = np.copy(img)
     rb = np.copy(img)
     peb = np.copy(img)
     for i in range(length):
         for j in range(width):
-            neigborhood_coordinates = [
-                (i - 1, j - 1), (i, j - 1), (i + 1, j - 1),
-                (i - 1,   j  ), (i,   j  ), (i + 1,   j  ),
-                (i - 1, j + 1), (i, j + 1), (i + 1, j + 1),
-            ]
+            neigborhood_coordinates = neighborhoodCoordinates(i, j, kernel_size)
             # Zero padding avarage filter
             zp[i, j] = zeroPadding(img, neigborhood_coordinates)
             
@@ -113,15 +120,32 @@ def averageFilter(img: np.ndarray):
             peb[i, j] = periodicallyExtendedBorders(img, neigborhood_coordinates)    
             
     # Show Images Result
-    cv.imshow('Original', img)
-    cv.imshow('A.F. Zero Padding', zp)
-    cv.imshow('A.F. Replicated Borders', rb)
-    cv.imshow('A.F. P. Extended Borders', peb)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
+    fig = plt.figure(figsize=(15, 7))
+    fig.add_subplot(1, 4, 1)
+    plt.imshow(img, cmap='gray')
+    plt.axis('off')
+    plt.title('Original Image')
+    
+    fig.add_subplot(1, 4, 2)
+    plt.imshow(zp, cmap='gray')
+    plt.axis('off')
+    plt.title('Zero Padding')
+    
+    fig.add_subplot(1, 4, 3)
+    plt.imshow(rb, cmap='gray')
+    plt.axis('off')
+    plt.title('Repliacted Borders')
+    
+    fig.add_subplot(1, 4, 4)
+    plt.imshow(zp, cmap='gray')
+    plt.axis('off')
+    plt.title('Periodically Extended Borders')
+    
+    fig.show()
+    input("Press Enter to continue...")
     
     
 if __name__ == "__main__":
     image_path = Path("img/68.png")
     img = cv.imread(str(image_path), cv.IMREAD_GRAYSCALE)
-    averageFilter(img)
+    averageFilter(img, 3)
