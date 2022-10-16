@@ -2,6 +2,7 @@ from pathlib import Path
 import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
+from scipy.ndimage import gaussian_filter
 
 #Functions
 
@@ -120,7 +121,9 @@ def averageFilter(img: np.ndarray, kernel_size:int):
             peb[i, j] = periodicallyExtendedBorders(img, neigborhood_coordinates)    
             
     # Show Images Result
-    fig = plt.figure(figsize=(15, 7))
+    fig = plt.figure(figsize=(15, 5))
+    plt.title('Average Filter')
+    plt.axis('off')
     fig.add_subplot(1, 4, 1)
     plt.imshow(img, cmap='gray')
     plt.axis('off')
@@ -137,15 +140,51 @@ def averageFilter(img: np.ndarray, kernel_size:int):
     plt.title('Repliacted Borders')
     
     fig.add_subplot(1, 4, 4)
-    plt.imshow(zp, cmap='gray')
+    plt.imshow(peb, cmap='gray')
     plt.axis('off')
     plt.title('Periodically Extended Borders')
     
     fig.show()
-    input("Press Enter to continue...")
+
+# Gaussian filter
+def gaussianFilter(img: np.ndarray, sigma:float):
+    esb = np.zeros_like(img)
+    epb = np.zeros_like(img)
+    zp = np.zeros_like(img)
     
+    esb = gaussian_filter(img, sigma, mode='reflect')
+    epb = gaussian_filter(img, sigma, mode='wrap')
+    zp = gaussian_filter(img, sigma, mode='constant', cval=0)
+    
+    # Show Images Result
+    fig = plt.figure(figsize=(15, 5))
+    plt.title('Gaussian Filter')
+    plt.axis('off')
+    fig.add_subplot(1, 4, 1)
+    plt.imshow(img, cmap='gray')
+    plt.axis('off')
+    plt.title('Original Image')
+    
+    fig.add_subplot(1, 4, 2)
+    plt.imshow(esb, cmap='gray')
+    plt.axis('off')
+    plt.title('Extended Symetric Borders')
+    
+    fig.add_subplot(1, 4, 3)
+    plt.imshow(epb, cmap='gray')
+    plt.axis('off')
+    plt.title('Periodically Extended Borders')
+    
+    fig.add_subplot(1, 4, 4)
+    plt.imshow(zp, cmap='gray')
+    plt.axis('off')
+    plt.title('Zero Padding')
+    
+    fig.show()
+    input("Press Enter to continue...")
     
 if __name__ == "__main__":
     image_path = Path("img/68.png")
     img = cv.imread(str(image_path), cv.IMREAD_GRAYSCALE)
     averageFilter(img, 3)
+    gaussianFilter(img, 0.5)
