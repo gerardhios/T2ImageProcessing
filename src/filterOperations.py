@@ -239,7 +239,7 @@ def symetricallyExtendedBordersKernel(img:np.ndarray, neigborhood_coordinates:li
 
 ####Filters####
 # average image filter
-def average_filter(img: np.ndarray, kernel_size:int):
+def average_filter(img: np.ndarray, kernel_size:int, ret:bool=False):
     length, width = img.shape
     zp = np.copy(img)
     rb = np.copy(img)
@@ -255,10 +255,12 @@ def average_filter(img: np.ndarray, kernel_size:int):
             
             # Periodically extended borders avarage filter
             peb[i, j] = periodicallyExtendedBorders(img, neigborhood_coordinates)    
-            
+    
+    if ret:
+        return zp, rb, peb
     # Show Images Result
     fig = plt.figure(figsize=(15, 5))
-    plt.title('Average Filter')
+    plt.title(f'Average Filter Kernel Size: {kernel_size}')
     plt.axis('off')
     fig.add_subplot(1, 4, 1)
     plt.imshow(img, cmap='gray')
@@ -363,10 +365,61 @@ def laplace_filter(img:np.ndarray, kernel:np.ndarray):
     fig.show()
     
 if __name__ == "__main__":
+    ##### Ejercicios #####
+    #### Ejercicio 1 ####
     image_path = Path("img/68.png")
     img = cv.imread(str(image_path), cv.IMREAD_GRAYSCALE)
+    average_filter(img, 5)
+    average_filter(img, 9)
+    average_filter(img, 15)
+    average_filter(img, 35)
+    #### Interpretacion de Resultados ####
+    # En el filtro promedio entre mas grande sea el tamano del kernel mas borroso se vuelve la imagen
+    # Como lo podemos ver en las imagenes resultantes, a medida que aumenta el tamano del kernel la imagen se vuelve mas borrosa
+    input("Press Enter to continue...")
+
+    #### Ejercicio 2 ####
+    image_path = Path("img/79.png")
+    img = cv.imread(str(image_path), cv.IMREAD_GRAYSCALE)
+    avimg = average_filter(img, 9, ret=True)[0]
+    ret, tresh = cv.threshold(avimg, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
+    fig = plt.figure(figsize=(15, 5))
+    plt.title('Ejercicio 2')
+    plt.axis('off')
+    fig.add_subplot(1, 3, 1)
+    plt.imshow(img, cmap='gray')
+    plt.axis('off')
+    plt.title('Original Image')
+    
+    fig.add_subplot(1, 3, 2)
+    plt.imshow(avimg, cmap='gray')
+    plt.axis('off')
+    plt.title('Average Filter Kernel 9')
+    
+    fig.add_subplot(1, 3, 3)
+    plt.imshow(tresh, cmap='gray')
+    plt.axis('off')
+    plt.title('Treshold')
+    fig.show()
+    input("Press Enter to continue...")
+    
+    #### Ejericio 3 ####
+    image_path = Path("img/70.png")
+    img = cv.imread(str(image_path), cv.IMREAD_GRAYSCALE)
+    #TODO: Ver como aplicar ruido sal y pimienta a una imagen
     average_filter(img, 3)
-    gaussian_filter(img, 0.5, 3)
-    laplace_filter(img, np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]]))
-    laplace_filter(img, np.array([[1, 1, 1], [1, -8, 1], [1, 1, 1]]))
+    #TODO: Ver como aplicar el filtro de mediana a una imagen
+    #### Interpretacion de Resultados ####
+    
+    input("Press Enter to continue...")
+    
+    #### Ejercicio 4 ####
+    image_path = Path("img/02.png")
+    img = cv.imread(str(image_path), cv.IMREAD_GRAYSCALE)
+    #### Inciso a ####
+    average_filter(img, 3)
+    #### Inciso b ####
+    average_filter(img, 7)
+    #### Inciso c ####
+    average_filter(img, 9)
     input("Press Enter to continue...")
