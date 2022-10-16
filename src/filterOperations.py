@@ -34,6 +34,17 @@ def gaussian_kernel(kernel_size:int, sigma:float) -> np.ndarray:
         for j in range(kernel_size):
             kernel[i, j] = np.exp(-(coords[i][j][0] ** 2 + coords[i][j][1] ** 2)/(2 * (sigma ** 2)))
     return kernel / kernel.sum()
+
+#Salt and pepper noise
+def salt_pepper_noise(img:np.ndarray, percentage:float):
+    cp = img.copy()
+    for i in range(cp.shape[0]):
+        for j in range(cp.shape[1]):
+            if np.random.random() < percentage:
+                cp[i, j] = 0
+            elif np.random.random() < percentage:
+                cp[i, j] = 255
+    return cp
  
 ####Border types####
 # Zero padding
@@ -366,6 +377,7 @@ def laplace_filter(img:np.ndarray, kernel:np.ndarray):
     
 if __name__ == "__main__":
     ##### Ejercicios #####
+    
     #### Ejercicio 1 ####
     image_path = Path("img/68.png")
     img = cv.imread(str(image_path), cv.IMREAD_GRAYSCALE)
@@ -405,12 +417,31 @@ if __name__ == "__main__":
     
     #### Ejericio 3 ####
     image_path = Path("img/70.png")
-    img = cv.imread(str(image_path), cv.IMREAD_GRAYSCALE)
-    #TODO: Ver como aplicar ruido sal y pimienta a una imagen
+    og = cv.imread(str(image_path), cv.IMREAD_GRAYSCALE)
+    img = salt_pepper_noise(og, 0.05)
     average_filter(img, 3)
-    #TODO: Ver como aplicar el filtro de mediana a una imagen
-    #### Interpretacion de Resultados ####
+    medianimg = cv.medianBlur(img, 3)
+    fig = plt.figure(figsize=(15, 5))
+    plt.title('Ejercicio 3')
+    plt.axis('off')
+    fig.add_subplot(1, 3, 1)
+    plt.imshow(og, cmap='gray')
+    plt.axis('off')
+    plt.title('Original Image')
     
+    fig.add_subplot(1, 3, 2)
+    plt.imshow(img, cmap='gray')
+    plt.axis('off')
+    plt.title('Salt and Pepper Noise')
+    
+    fig.add_subplot(1, 3, 3)
+    plt.imshow(medianimg, cmap='gray')
+    plt.axis('off')
+    plt.title('Median Filter')
+    fig.show()
+    #### Interpretacion de Resultados ####
+    # En el filtro por mediana se puede ver que el ruido se elimina, pero tambien se pierde informacion de la imagen
+    # En el filtro promedio se puede ver que el ruido se elimina, pero se pierde menos información de la imagen
     input("Press Enter to continue...")
     
     #### Ejercicio 4 ####
